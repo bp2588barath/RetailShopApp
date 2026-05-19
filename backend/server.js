@@ -1,39 +1,30 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
 require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
 
 const app = express();
 
-// Middleware
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 
-// Routes Import
-const authRoutes = require("./routes/authRoutes");
+// ✅ IMPORT ROUTES
 const productRoutes = require("./routes/productRoutes");
+const authRoutes = require("./routes/authRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
-
-// Routes Use
-app.use("/api/auth", authRoutes);
+// ✅ USE ROUTES (THIS IS WHERE YOUR LINE GOES)
 app.use("/api/products", productRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 
-// Test Route
-app.get("/", (req, res) => {
-  res.send("Retail Shop Backend Running");
-});
+// DATABASE
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch(err => console.log(err));
 
-// MongoDB Connection
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected Successfully"))
-  .catch((err) => console.log("MongoDB Connection Error:", err));
-
-// Server Start
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// SERVER
+app.listen(5000, () => {
+  console.log("Server running on port 5000");
 });

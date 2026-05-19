@@ -1,52 +1,59 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import API from "../services/api";
 import Navbar from "../components/Navbar";
 import ProductCard from "../components/ProductCard";
 
-function Home() {
+export default function Home() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    API.get("/products")
-      .then((res) => setProducts(res.data))
-      .catch((err) => console.log(err));
+    API.get("/products").then((res) => setProducts(res.data));
   }, []);
 
-  const addToCart = async (productId) => {
-    try {
-      const customerId = localStorage.getItem("userId");
-      if (!customerId) {
-        alert("Please login first");
-        return;
-      }
+  const addToCart = async (id) => {
+    const userId = localStorage.getItem("userId");
 
-      await API.post("/cart/add", {
-        customerId,
-        productId,
-        quantity: 1,
-      });
-
-      alert("Added to cart");
-    } catch (err) {
-      alert("Error adding to cart");
-    }
+    await API.post("/cart/add", {
+      customerId: userId,
+      productId: id,
+      quantity: 1,
+    });
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div>
       <Navbar />
 
-      <div className="p-6">
-        <h2 className="text-2xl font-bold mb-6">Available Products</h2>
+      {/* HERO SECTION */}
+      <div style={styles.hero}>
+        <h1>Big Deals on Everything 🛍️</h1>
+      </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {products.map((p) => (
-            <ProductCard key={p._id} product={p} onAddToCart={addToCart} />
-          ))}
-        </div>
+      {/* PRODUCTS */}
+      <div style={styles.grid}>
+        {products.map((p) => (
+          <ProductCard
+            key={p._id}
+            product={p}
+            addToCart={addToCart}
+          />
+        ))}
       </div>
     </div>
   );
 }
 
-export default Home;
+const styles = {
+  hero: {
+    background: "#37475a",
+    color: "white",
+    padding: "40px",
+    textAlign: "center",
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    gap: "15px",
+    padding: "20px",
+  },
+};

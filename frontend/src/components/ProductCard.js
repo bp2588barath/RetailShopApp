@@ -1,24 +1,65 @@
-import React from "react";
+import { motion } from "framer-motion";
+import { FiStar } from "react-icons/fi";
 
-function ProductCard({ product, onAddToCart }) {
+export default function ProductCard({ product, addToCart }) {
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 hover:shadow-xl transition">
-      <h2 className="text-lg font-semibold">{product.name}</h2>
-      <p className="text-gray-500 text-sm">{product.description}</p>
+    <motion.div
+      whileHover={{ scale: 1.03 }}
+      style={styles.card}
+    >
+      <img
+        src={product.image || "https://via.placeholder.com/200"}
+        style={styles.img}
+      />
 
-      <div className="mt-3 flex justify-between items-center">
-        <p className="font-bold text-green-600">₹{product.price}</p>
-        <p className="text-sm text-gray-600">Stock: {product.stock}</p>
+      <h3>{product.name}</h3>
+
+      <div style={styles.rating}>
+        <FiStar color="gold" />
+        <FiStar color="gold" />
+        <FiStar color="gold" />
+        <FiStar color="gold" />
+        <FiStar />
       </div>
 
+      <p style={styles.price}>₹ {product.price}</p>
+
       <button
-        onClick={() => onAddToCart(product._id)}
-        className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+        style={styles.btn}
+        onClick={() => addToCart(product._id)}
       >
         Add to Cart
       </button>
-    </div>
+    </motion.div>
   );
 }
 
-export default ProductCard;
+const styles = {
+  card: {
+    background: "white",
+    padding: "15px",
+    borderRadius: "10px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+  },
+  img: {
+    width: "100%",
+    height: "180px",
+    objectFit: "cover",
+  },
+  rating: {
+    display: "flex",
+    marginTop: "5px",
+  },
+  price: {
+    fontWeight: "bold",
+    marginTop: "5px",
+  },
+  btn: {
+    marginTop: "10px",
+    width: "100%",
+    padding: "10px",
+    background: "#ff9900",
+    border: "none",
+    borderRadius: "5px",
+  },
+};
