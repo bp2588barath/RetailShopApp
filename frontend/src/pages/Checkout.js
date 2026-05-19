@@ -1,99 +1,74 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import Navbar from "../components/Navbar";
 import API from "../services/api";
 import { useNavigate } from "react-router-dom";
 
 function Checkout() {
   const [cart, setCart] = useState(null);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const customerId = localStorage.getItem("userId");
 
-  const fetchCart = async () => {
+  const fetchCart = useCallback(async () => {
     try {
       const res = await API.get(`/cart/${customerId}`);
       setCart(res.data);
     } catch (err) {
       console.log(err);
     }
-  };
-
-  useEffect(() => {
-    if (customerId) fetchCart();
   }, [customerId]);
 
-  const totalPrice =
-    cart?.items?.reduce(
-      (sum, item) => sum + item.productId.price * item.quantity,
-      0
-    ) || 0;
+  useEffect(() => {
+    fetchCart();
+  }, [fetchCart]);
 
   const placeOrder = async () => {
-    if (!cart || cart.items.length === 0) {
-      alert("Cart is empty");
-      return;
-    }
-
     try {
-      setLoading(true);
-
-      const items = cart.items.map((item) => ({
-        productId: item.productId._id,
-        quantity: item.quantity,
+      const items = cart.items.map((i) => ({
+        productId: i.productId._id,
+        quantity: i.quantity,
       }));
 
       await API.post("/orders/create", {
         customerId,
-        paymentMethod: "COD",
         items,
+        paymentMethod: "COD",
       });
 
-      alert("Order Placed Successfully!");
+      alert("Order placed successfully!");
       navigate("/orders");
     } catch (err) {
-      alert("Order Failed");
-    } finally {
-      setLoading(false);
+      console.log(err);
     }
   };
 
+  if (!cart) return <p>Loading...</p>;
+
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div>
       <Navbar />
 
-      <div className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Checkout</h2>
+      <div className="p-5">
+        <h2 className="text-2xl font-bold">Checkout</h2>
 
-        {!cart || !cart.items ? (
-          <p>Loading cart...</p>
-        ) : cart.items.length === 0 ? (
-          <p className="text-gray-600">Cart is empty.</p>
+        {cart.items.length === 0 ? (
+          <p>Cart is empty</p>
         ) : (
-          <div className="bg-white p-5 rounded-xl shadow">
-            <h3 className="text-lg font-semibold mb-3">Order Summary</h3>
-
+          <>
             {cart.items.map((item) => (
-              <div key={item._id} className="flex justify-between border-b py-2">
+              <div key={item._id} className="border p-3 mt-3">
                 <p>{item.productId.name}</p>
-                <p>
-                  {item.quantity} × ₹{item.productId.price}
-                </p>
+                <p>Qty: {item.quantity}</p>
               </div>
             ))}
 
-            <div className="mt-4 flex justify-between items-center">
-              <h3 className="text-xl font-bold">Total: ₹{totalPrice}</h3>
-
-              <button
-                onClick={placeOrder}
-                disabled={loading}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:bg-gray-400"
-              >
-                {loading ? "Placing..." : "Place Order (COD)"}
-              </button>
-            </div>
-          </div>
+            <button
+              onClick={placeOrder}
+              className="bg-green-600 text-white px-4 py-2 mt-4"
+            >
+              Place Order
+            </button>
+          </>
         )}
       </div>
     </div>
