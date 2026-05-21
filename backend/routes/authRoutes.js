@@ -1,133 +1,122 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
-const Owner = require("../models/Owner");
-const Customer = require("../models/Customer");
+const bcrypt = require("bcryptjs");
+
+const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
-// JWT Generator
-const generateToken = (id, role) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "1d" });
-};
+const User = require("../models/User");
 
-/* ================= OWNER REGISTER ================= */
-router.post("/owner/register", async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
 
-    const existingOwner = await Owner.findOne({ email });
-    if (existingOwner) {
-      return res.status(400).json({ message: "Owner already exists" });
-    }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+/* REGISTER */
 
-    const newOwner = new Owner({
-      name,
-      email,
-      password: hashedPassword,
+router.post("/register", async(req,res)=>{
+
+  try{
+
+    const hashedPassword =
+      await bcrypt.hash(req.body.password,10);
+
+    const newUser = new User({
+
+      name:req.body.name,
+
+      email:req.body.email,
+
+      password:hashedPassword,
+
+      role:req.body.role || "customer"
+
     });
 
-    await newOwner.save();
+    await newUser.save();
 
-    res.status(201).json({
-      message: "Owner registered successfully",
-      userId: newOwner._id,
-      role: "owner",
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.json("User Registered");
+
+  }catch(err){
+
+    res.status(500).json(err);
+
   }
+
 });
 
-/* ================= OWNER LOGIN ================= */
-router.post("/owner/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
 
-    const owner = await Owner.findOne({ email });
-    if (!owner) {
-      return res.status(400).json({ message: "Invalid email" });
+
+/* LOGIN */
+
+router.post("/login", async(req,res)=>{
+
+  try{
+
+    const user =
+      await User.findOne({
+
+        email:req.body.email
+
+      });
+
+    if(!user){
+
+      return res.status(404).json(
+        "User Not Found"
+      );
+
     }
 
-    const isMatch = await bcrypt.compare(password, owner.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
+    const validPassword =
+      await bcrypt.compare(
+
+        req.body.password,
+
+        user.password
+
+      );
+
+    if(!validPassword){
+
+      return res.status(400).json(
+        "Invalid Password"
+      );
+
     }
 
-    const token = generateToken(owner._id, "owner");
+    const token = jwt.sign(
+
+      {
+
+        id:user._id,
+
+        role:user.role
+
+      },
+
+      process.env.JWT_SECRET,
+
+      {
+
+        expiresIn:"7d"
+
+      }
+
+    );
 
     res.json({
-      message: "Owner login successful",
+
       token,
-      userId: owner._id,
-      role: "owner",
+
+      user
+
     });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+
+  }catch(err){
+
+    res.status(500).json(err);
+
   }
-});
 
-/* ================= CUSTOMER REGISTER ================= */
-router.post("/customer/register", async (req, res) => {
-  try {
-    const { name, email, phone, address, password } = req.body;
-
-    const existingCustomer = await Customer.findOne({ email });
-    if (existingCustomer) {
-      return res.status(400).json({ message: "Customer already exists" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newCustomer = new Customer({
-      name,
-      email,
-      phone,
-      address,
-      password: hashedPassword,
-    });
-
-    await newCustomer.save();
-
-    res.status(201).json({
-      message: "Customer registered successfully",
-      userId: newCustomer._id,
-      role: "customer",
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-/* ================= CUSTOMER LOGIN ================= */
-router.post("/customer/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const customer = await Customer.findOne({ email });
-    if (!customer) {
-      return res.status(400).json({ message: "Invalid email" });
-    }
-
-    const isMatch = await bcrypt.compare(password, customer.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
-    }
-
-    const token = generateToken(customer._id, "customer");
-
-    res.json({
-      message: "Customer login successful",
-      token,
-      userId: customer._id,
-      role: "customer",
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
 });
 
 module.exports = router;

@@ -1,58 +1,142 @@
-import React, { useState } from "react";
-import API from "../../services/api";
-import { useNavigate } from "react-router-dom";
+import React,{
+  useState
+} from "react";
 
-function AdminLogin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+import axios from "axios";
+
+import { useNavigate } from
+"react-router-dom";
+
+export default function AdminLogin(){
 
   const navigate = useNavigate();
 
-  const loginOwner = async (e) => {
-    e.preventDefault();
+  const [formData,setFormData] =
+    useState({
 
-    try {
-      const res = await API.post("/auth/owner/login", { email, password });
+      email:"",
+      password:""
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", "owner");
+    });
 
-      alert("Owner Login Success");
-      navigate("/admin/dashboard");
-    } catch (err) {
-      alert("Owner Login Failed");
-    }
+  const handleChange = (e) => {
+
+    setFormData({
+
+      ...formData,
+
+      [e.target.name]:
+      e.target.value
+
+    });
+
   };
 
-  return (
-    <div className="bg-gray-100 min-h-screen flex justify-center items-center">
-      <form
-        onSubmit={loginOwner}
-        className="bg-white p-6 rounded-xl shadow-md w-96"
+  const login = async() => {
+
+    try{
+
+      const res = await axios.post(
+
+        "http://localhost:5000/api/auth/login",
+
+        formData
+
+      );
+
+      localStorage.setItem(
+
+        "token",
+
+        res.data.token
+
+      );
+
+      localStorage.setItem(
+
+        "user",
+
+        JSON.stringify(res.data.user)
+
+      );
+
+      navigate("/admin");
+
+    }catch(err){
+
+      alert("Login Failed");
+
+    }
+
+  };
+
+  return(
+
+    <div
+      style={{
+        display:"flex",
+        justifyContent:"center",
+        alignItems:"center",
+        height:"100vh",
+        background:"#f3f4f6"
+      }}
+    >
+
+      <div
+        style={{
+          background:"white",
+          padding:"40px",
+          borderRadius:"15px",
+          width:"400px"
+        }}
       >
-        <h2 className="text-xl font-bold mb-4">Owner Login</h2>
+
+        <h1>Admin Login</h1>
 
         <input
-          className="w-full border p-2 mb-3"
-          placeholder="Owner Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="email"
+          name="email"
+          placeholder="Email"
+          onChange={handleChange}
+          style={{
+            width:"100%",
+            padding:"12px",
+            marginTop:"20px"
+          }}
         />
 
         <input
-          className="w-full border p-2 mb-3"
           type="password"
-          placeholder="Owner Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          name="password"
+          placeholder="Password"
+          onChange={handleChange}
+          style={{
+            width:"100%",
+            padding:"12px",
+            marginTop:"20px"
+          }}
         />
 
-        <button className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-          Login
-        </button>
-      </form>
-    </div>
-  );
-}
+        <button
+          onClick={login}
+          style={{
+            width:"100%",
+            padding:"14px",
+            marginTop:"20px",
+            background:"#2563eb",
+            color:"white",
+            border:"none"
+          }}
+        >
 
-export default AdminLogin;
+          Login
+
+        </button>
+
+      </div>
+
+    </div>
+
+  );
+
+}

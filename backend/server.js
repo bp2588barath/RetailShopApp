@@ -6,46 +6,135 @@ const mongoose = require("mongoose");
 
 const app = express();
 
-// ================= MIDDLEWARE =================
+
+
+/* =====================================
+   MIDDLEWARE
+===================================== */
+
 app.use(express.json());
 
-// ✅ CORS FIX
+
+
+/* =====================================
+   CORS
+===================================== */
+
 app.use(
+
   cors({
+
     origin: [
+
       "http://localhost:3000",
-      "https://your-netlify-site.netlify.app"
+
+      "https://retailshopapp.netlify.app"
+
     ],
-    credentials: true,
+
+    credentials: true
+
   })
+
 );
 
-// ================= IMPORT ROUTES =================
-const productRoutes = require("./routes/productRoutes");
-const authRoutes = require("./routes/authRoutes");
-const cartRoutes = require("./routes/cartRoutes");
-const orderRoutes = require("./routes/orderRoutes");
 
-// ================= USE ROUTES =================
-app.use("/api/products", productRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/cart", cartRoutes);
-app.use("/api/orders", orderRoutes);
 
-// ================= ROOT ROUTE =================
+/* =====================================
+   IMPORT ROUTES
+===================================== */
+
+const productRoutes =
+require("./routes/productRoutes");
+
+const authRoutes =
+require("./routes/authRoutes");
+
+const cartRoutes =
+require("./routes/cartRoutes");
+
+const orderRoutes =
+require("./routes/orderRoutes");
+
+
+
+/* =====================================
+   API ROUTES
+===================================== */
+
+app.use(
+  "/api/products",
+  productRoutes
+);
+
+app.use(
+  "/api/auth",
+  authRoutes
+);
+
+app.use(
+  "/api/cart",
+  cartRoutes
+);
+
+app.use(
+  "/api/orders",
+  orderRoutes
+);
+
+
+
+/* =====================================
+   ROOT ROUTE
+===================================== */
+
 app.get("/", (req, res) => {
-  res.send("Retail Shop Backend Running 🚀");
+
+  res.send(
+    "Retail Shop Backend Running 🚀"
+  );
+
 });
 
-// ================= DATABASE =================
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log(err));
 
-// ================= SERVER =================
-const PORT = process.env.PORT || 5000;
+
+/* =====================================
+   DATABASE CONNECTION
+===================================== */
+
+mongoose.connect(process.env.MONGO_URI)
+
+.then(() => {
+
+  console.log(
+    "MongoDB Connected Successfully"
+  );
+
+})
+
+.catch((err) => {
+
+  console.log(
+    "MongoDB Connection Failed"
+  );
+
+  console.log(err);
+
+});
+
+
+
+/* =====================================
+   SERVER
+===================================== */
+
+const PORT =
+process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+
+  console.log(
+    `Server running on port ${PORT}`
+  );
+
 });
