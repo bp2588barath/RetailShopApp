@@ -1,30 +1,51 @@
 require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
 const app = express();
 
+// ================= MIDDLEWARE =================
 app.use(express.json());
-app.use(cors());
 
-// ✅ IMPORT ROUTES
+// ✅ CORS FIX
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://your-netlify-site.netlify.app"
+    ],
+    credentials: true,
+  })
+);
+
+// ================= IMPORT ROUTES =================
 const productRoutes = require("./routes/productRoutes");
 const authRoutes = require("./routes/authRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
-// ✅ USE ROUTES (THIS IS WHERE YOUR LINE GOES)
+
+// ================= USE ROUTES =================
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 
-// DATABASE
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log(err));
+// ================= ROOT ROUTE =================
+app.get("/", (req, res) => {
+  res.send("Retail Shop Backend Running 🚀");
+});
 
-// SERVER
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+// ================= DATABASE =================
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.log(err));
+
+// ================= SERVER =================
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
