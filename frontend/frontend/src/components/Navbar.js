@@ -1,40 +1,63 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { FiShoppingCart, FiSearch } from "react-icons/fi";
 
-function Navbar() {
-  const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("userId");
-    navigate("/login");
-  };
-
+export default function Navbar() {
   return (
-    <nav className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center shadow-lg">
-      <h1 className="text-xl font-bold">Retail Shop</h1>
-
-      <div className="flex gap-4 items-center">
-        <Link to="/" className="hover:text-gray-200">Home</Link>
-        <Link to="/cart" className="hover:text-gray-200">Cart</Link>
-        <Link to="/orders" className="hover:text-gray-200">Orders</Link>
-        <Link to="/admin" className="hover:text-gray-200">Owner</Link>
-
-        {!token ? (
-          <Link to="/login" className="hover:text-gray-200">Login</Link>
-        ) : (
-          <button
-            onClick={logout}
-            className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
-          >
-            Logout
-          </button>
-        )}
+    <div style={styles.nav}>
+      
+      {/* LEFT LOGO */}
+      <div style={styles.logo}>
+        RetailShop
       </div>
-    </nav>
+
+      {/* SEARCH BAR */}
+      <div style={styles.searchBox}>
+        <input placeholder="Search products..." style={styles.input} />
+        <FiSearch />
+      </div>
+
+      {/* RIGHT LINKS */}
+      <div style={styles.links}>
+        <Link to="/login">Login</Link>
+        <Link to="/cart">
+          <FiShoppingCart size={22} />
+        </Link>
+      </div>
+
+    </div>
   );
 }
 
-export default Navbar;
+const styles = {
+  nav: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    background: "#131921",
+    color: "white",
+    padding: "10px 20px",
+  },
+  logo: {
+    fontSize: "20px",
+    fontWeight: "bold",
+  },
+  searchBox: {
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+    background: "white",
+    margin: "0 20px",
+    padding: "5px 10px",
+    borderRadius: "5px",
+    color: "black",
+  },
+  input: {
+    width: "100%",
+    border: "none",
+    outline: "none",
+  },
+  links: {
+    display: "flex",
+    gap: "15px",
+  },
+};

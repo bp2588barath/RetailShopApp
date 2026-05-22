@@ -1,77 +1,71 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-// Customer Pages
+/* MAIN PAGES */
+
 import Home from "./pages/Home";
+import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 
-// Admin Pages
-import AdminLogin from "./pages/admin/AdminLogin";
+/* ADMIN PAGES */
+
 import Dashboard from "./pages/admin/Dashboard";
+import AdminLogin from "./pages/admin/AdminLogin";
 import ManageProducts from "./pages/admin/ManageProducts";
 import ManageOrders from "./pages/admin/ManageOrders";
 
-// Protected Route
-import ProtectedRoute from "./components/ProtectedRoute";
-
 function App() {
+
   return (
+
     <BrowserRouter>
+
       <Routes>
-        {/* Customer Routes */}
+
+        {/* CUSTOMER ROUTES */}
+
         <Route path="/" element={<Home />} />
+
+        <Route path="/cart" element={<Cart />} />
+
+        <Route path="/checkout" element={<Checkout />} />
+
+        <Route path="/orders" element={<Orders />} />
+
+        {/* AUTH */}
+
         <Route path="/login" element={<Login />} />
+
         <Route path="/register" element={<Register />} />
 
+        {/* ADMIN */}
+
+        <Route path="/admin" element={<Dashboard />} />
+
         <Route
-          path="/cart"
-          element={
-            <ProtectedRoute>
-              <Cart />
-            </ProtectedRoute>
-          }
+          path="/admin/login"
+          element={<AdminLogin />}
         />
 
         <Route
-          path="/checkout"
-          element={
-            <ProtectedRoute>
-              <Checkout />
-            </ProtectedRoute>
-          }
+          path="/admin/products"
+          element={<ManageProducts />}
         />
 
         <Route
-          path="/orders"
-          element={
-            <ProtectedRoute>
-              <Orders />
-            </ProtectedRoute>
-          }
+          path="/admin/orders"
+          element={<ManageOrders />}
         />
 
-        {/* Admin Routes */}
-        <Route path="/admin" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<Dashboard />} />
-        <Route path="/admin/manage-products" element={<ManageProducts />} />
-        <Route path="/admin/manage-orders" element={<ManageOrders />} />
-
-        {/* 404 Page */}
-        <Route
-          path="*"
-          element={
-            <h1 style={{ textAlign: "center", marginTop: "50px" }}>
-              404 - Page Not Found
-            </h1>
-          }
-        />
       </Routes>
+
     </BrowserRouter>
+
   );
+
 }
 
 export default App;

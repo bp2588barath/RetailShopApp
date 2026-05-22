@@ -1,24 +1,58 @@
 import React from "react";
+import "../styles/productcard.css";
 
-function ProductCard({ product, onAddToCart }) {
+export default function ProductCard({ product }) {
+
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 hover:shadow-xl transition">
-      <h2 className="text-lg font-semibold">{product.name}</h2>
-      <p className="text-gray-500 text-sm">{product.description}</p>
 
-      <div className="mt-3 flex justify-between items-center">
-        <p className="font-bold text-green-600">₹{product.price}</p>
-        <p className="text-sm text-gray-600">Stock: {product.stock}</p>
+    <div className="product-card">
+
+      <div className="product-image-container">
+
+        <img
+          src={product.image}
+          alt={product.name}
+        />
+
+        <span className="discount-badge">
+          20% OFF
+        </span>
+
       </div>
 
-      <button
-        onClick={() => onAddToCart(product._id)}
-        className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-      >
-        Add to Cart
-      </button>
+      <div className="product-info">
+
+        <h3>{product.name}</h3>
+
+        <div className="rating">
+
+          ⭐⭐⭐⭐⭐
+          <span>(120 Reviews)</span>
+
+        </div>
+
+        <p className="description">
+          Premium quality product with modern features
+          and best performance.
+        </p>
+
+        <div className="price-section">
+
+          <h2>₹ {product.price}</h2>
+
+          <span className="old-price">
+            ₹ {product.price + 1000}
+          </span>
+
+        </div>
+
+        <button>
+          Add To Cart
+        </button>
+
+      </div>
+
     </div>
+
   );
 }
-
-export default ProductCard;

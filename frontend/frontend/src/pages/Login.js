@@ -1,70 +1,99 @@
 import React, { useState } from "react";
-import API from "../services/api";
-import Navbar from "../components/Navbar";
-import { useNavigate, Link } from "react-router-dom";
+import "../styles/login.css";
 
-function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function Login() {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-  const navigate = useNavigate();
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-  const handleLogin = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    try {
-      const res = await API.post("/auth/customer/login", { email, password });
+    console.log(formData);
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", "customer");
-
-      alert("Login Success");
-      navigate("/");
-    } catch (err) {
-      alert("Login Failed");
-    }
+    // API login later
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen">
-      <Navbar />
+    <div className="login-page">
 
-      <div className="flex justify-center items-center p-10">
-        <form
-          onSubmit={handleLogin}
-          className="bg-white p-6 rounded-xl shadow-md w-96"
-        >
-          <h2 className="text-xl font-bold mb-4">Customer Login</h2>
+      <div className="login-left">
+        <h1>Retail Shop</h1>
+        <p>
+          Manage products, orders, customers and shopping experience
+          with a modern retail platform.
+        </p>
+
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/3081/3081559.png"
+          alt="Retail"
+        />
+      </div>
+
+      <div className="login-right">
+
+        <form className="login-form" onSubmit={handleSubmit}>
+
+          <h2>Welcome Back</h2>
+
+          <p className="subtitle">
+            Login to continue shopping
+          </p>
+
+          <label>Email Address</label>
 
           <input
-            className="w-full border p-2 mb-3"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            onChange={handleChange}
+            required
           />
 
+          <label>Password</label>
+
           <input
-            className="w-full border p-2 mb-3"
             type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            name="password"
+            placeholder="Enter your password"
+            onChange={handleChange}
+            required
           />
 
-          <button className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+          <div className="login-options">
+
+            <label className="remember">
+              <input type="checkbox" />
+              Remember Me
+            </label>
+
+            <span className="forgot">
+              Forgot Password?
+            </span>
+
+          </div>
+
+          <button type="submit">
             Login
           </button>
 
-          <p className="mt-3 text-sm">
-            New user?{" "}
-            <Link className="text-blue-600" to="/register">
-              Register
-            </Link>
+          <p className="register-text">
+            Don’t have an account?
+            <span> Register</span>
           </p>
+
         </form>
+
       </div>
+
     </div>
   );
 }
-
-export default Login;
