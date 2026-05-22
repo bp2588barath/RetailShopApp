@@ -1,0 +1,38 @@
+.orders-page{
+  padding:40px;
+  background:#f3f4f6;
+  min-height:100vh;
+}
+
+.orders-page h1{
+  margin-bottom:30px;
+}
+
+table{
+  width:100%;
+  background:white;
+  border-collapse:collapse;
+  border-radius:15px;
+  overflow:hidden;
+}
+
+th{
+  background:#111827;
+  color:white;
+  padding:18px;
+}
+
+td{
+  padding:18px;
+  border-bottom:1px solid #ddd;
+}
+
+button{
+  padding:10px 16px;
+  border:none;
+  background:#2563eb;
+  color:white;
+  border-radius:8px;
+  margin-right:10px;
+  cursor:pointer;
+}
