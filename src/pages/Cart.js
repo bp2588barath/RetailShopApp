@@ -1,82 +1,174 @@
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useState } from "react";
 import Navbar from "../components/Navbar";
-import API from "../services/api";
+import "../styles/cart.css";
 
-function Cart() {
-  const [cart, setCart] = useState(null);
+export default function Cart() {
 
-  const customerId = localStorage.getItem("userId");
+  const [cartItems, setCartItems] = useState([
 
-  const fetchCart = useCallback(async () => {
-    try {
-      const res = await API.get(`/cart/${customerId}`);
-      setCart(res.data);
-    } catch (err) {
-      console.log(err);
+    {
+      id:1,
+      name:"Wireless Headphones",
+      price:2999,
+      quantity:1,
+      image:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e"
+    },
+
+    {
+      id:2,
+      name:"Smart Watch",
+      price:4999,
+      quantity:1,
+      image:"https://images.unsplash.com/photo-1523275335684-37898b6baf30"
     }
-  }, [customerId]);
 
-  useEffect(() => {
-    fetchCart();
-  }, [fetchCart]);
+  ]);
 
-  const updateQuantity = async (productId, type) => {
-    try {
-      await API.put("/cart/update", {
-        customerId,
-        productId,
-        type,
-      });
-      fetchCart();
-    } catch (err) {
-      console.log(err);
-    }
+  const increaseQty = (id) => {
+
+    setCartItems(
+
+      cartItems.map((item) =>
+
+        item.id === id
+          ? { ...item, quantity:item.quantity + 1 }
+          : item
+
+      )
+
+    );
+
   };
 
-  const removeItem = async (productId) => {
-    try {
-      await API.delete(`/cart/remove/${customerId}/${productId}`);
-      fetchCart();
-    } catch (err) {
-      console.log(err);
-    }
+  const decreaseQty = (id) => {
+
+    setCartItems(
+
+      cartItems.map((item) =>
+
+        item.id === id && item.quantity > 1
+          ? { ...item, quantity:item.quantity - 1 }
+          : item
+
+      )
+
+    );
+
   };
+
+  const totalPrice = cartItems.reduce(
+
+    (total,item) => total + item.price * item.quantity,
+    0
+
+  );
 
   return (
+
     <div>
+
       <Navbar />
 
-      <div className="p-5">
-        <h2 className="text-2xl font-bold">My Cart</h2>
+      <div className="cart-page">
 
-        {!cart || cart.items?.length === 0 ? (
-          <p className="mt-4">Cart is empty</p>
-        ) : (
-          cart.items.map((item) => (
-            <div key={item._id} className="border p-3 mt-3">
-              <h3>{item.productId.name}</h3>
+        {/* LEFT */}
 
-              <p>Price: ₹{item.productId.price}</p>
+        <div className="cart-left">
 
-              <p>Qty: {item.quantity}</p>
+          <h1>
+            Shopping Cart
+          </h1>
 
-              <button onClick={() => updateQuantity(item.productId._id, "inc")}>
-                +
-              </button>
+          {cartItems.map((item) => (
 
-              <button onClick={() => updateQuantity(item.productId._id, "dec")}>
-                -
-              </button>
+            <div className="cart-card" key={item.id}>
 
-              <button onClick={() => removeItem(item.productId._id)}>
-                Remove
-              </button>
+              <img
+                src={item.image}
+                alt={item.name}
+              />
+
+              <div className="cart-details">
+
+                <h2>{item.name}</h2>
+
+                <p>
+                  Premium quality product with fast delivery.
+                </p>
+
+                <h3>
+                  ₹ {item.price}
+                </h3>
+
+                <div className="quantity-controls">
+
+                  <button
+                    onClick={() => decreaseQty(item.id)}
+                  >
+                    -
+                  </button>
+
+                  <span>
+                    {item.quantity}
+                  </span>
+
+                  <button
+                    onClick={() => increaseQty(item.id)}
+                  >
+                    +
+                  </button>
+
+                </div>
+
+              </div>
+
             </div>
-          ))
-        )}
+
+          ))}
+
+        </div>
+
+        {/* RIGHT */}
+
+        <div className="cart-right">
+
+          <h2>Order Summary</h2>
+
+          <div className="summary-row">
+
+            <span>Items</span>
+
+            <span>{cartItems.length}</span>
+
+          </div>
+
+          <div className="summary-row">
+
+            <span>Delivery</span>
+
+            <span>₹ 99</span>
+
+          </div>
+
+          <div className="summary-row total">
+
+            <span>Total</span>
+
+            <span>
+              ₹ {totalPrice + 99}
+            </span>
+
+          </div>
+
+          <button className="checkout-btn">
+            Proceed To Checkout
+          </button>
+
+        </div>
+
       </div>
+
     </div>
+
   );
 }
-
-export default Cart;
