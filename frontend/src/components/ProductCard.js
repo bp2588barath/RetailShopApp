@@ -1,58 +1,101 @@
-import React from "react";
+import React, { useState } from "react";
 import "../styles/productcard.css";
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, onAddToCart }) {
+  const [added, setAdded]       = useState(false);
+  const [wishlisted, setWish]   = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  const discountPct = 20;
+  const oldPrice    = Math.round(product.price / (1 - discountPct / 100));
+
+  function handleAdd() {
+    if (added) return;
+    setAdded(true);
+    if (onAddToCart) onAddToCart(product);
+    setTimeout(() => setAdded(false), 2000);
+  }
 
   return (
+    <div className="pc-card">
 
-    <div className="product-card">
+      {/* ── IMAGE ── */}
+      <div className="pc-img-wrap">
+        {imgError ? (
+          <div className="pc-img-fallback">📦</div>
+        ) : (
+          <img
+            src={product.image}
+            alt={product.name}
+            className="pc-img"
+            onError={() => setImgError(true)}
+          />
+        )}
 
-      <div className="product-image-container">
+        {/* Badges */}
+        <span className="pc-badge-discount">{discountPct}% OFF</span>
 
-        <img
-          src={product.image}
-          alt={product.name}
-        />
+        {product.stock === 0 && (
+          <div className="pc-out-of-stock">Out of Stock</div>
+        )}
 
-        <span className="discount-badge">
-          20% OFF
-        </span>
+        {/* Wishlist */}
+        <button
+          className={`pc-wish ${wishlisted ? "pc-wish--on" : ""}`}
+          onClick={() => setWish(w => !w)}
+          aria-label="Toggle wishlist"
+        >
+          {wishlisted ? "❤️" : "🤍"}
+        </button>
 
+        {/* Quick view overlay */}
+        <div className="pc-overlay">
+          <span className="pc-quick">Quick View</span>
+        </div>
       </div>
 
-      <div className="product-info">
+      {/* ── INFO ── */}
+      <div className="pc-info">
 
-        <h3>{product.name}</h3>
+        {/* Category */}
+        {product.category && (
+          <span className="pc-category">{product.category}</span>
+        )}
 
-        <div className="rating">
+        <h3 className="pc-name">{product.name}</h3>
 
-          ⭐⭐⭐⭐⭐
-          <span>(120 Reviews)</span>
-
+        {/* Rating */}
+        <div className="pc-rating">
+          <span className="pc-stars">
+            {"★".repeat(Math.floor(product.rating || 5))}
+            {"☆".repeat(5 - Math.floor(product.rating || 5))}
+          </span>
+          <span className="pc-reviews">
+            {product.rating || "5.0"} ({product.reviews || 120} reviews)
+          </span>
         </div>
 
-        <p className="description">
-          Premium quality product with modern features
-          and best performance.
+        <p className="pc-desc">
+          {product.description || "Premium quality product with modern features and best performance."}
         </p>
 
-        <div className="price-section">
-
-          <h2>₹ {product.price}</h2>
-
-          <span className="old-price">
-            ₹ {product.price + 1000}
-          </span>
-
+        {/* Price */}
+        <div className="pc-price-row">
+          <span className="pc-price">₹{product.price.toLocaleString("en-IN")}</span>
+          <span className="pc-old-price">₹{oldPrice.toLocaleString("en-IN")}</span>
+          <span className="pc-savings">Save ₹{(oldPrice - product.price).toLocaleString("en-IN")}</span>
         </div>
 
-        <button>
-          Add To Cart
+        {/* Add to cart */}
+        <button
+          className={`pc-btn ${added ? "pc-btn--added" : ""} ${product.stock === 0 ? "pc-btn--disabled" : ""}`}
+          onClick={handleAdd}
+          disabled={product.stock === 0}
+        >
+          {product.stock === 0 ? "Out of Stock" : added ? "✓ Added to Cart!" : "+ Add to Cart"}
         </button>
 
       </div>
-
     </div>
-
   );
 }
